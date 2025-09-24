@@ -1,0 +1,52 @@
+---
+title: "R Notebook"
+output: html_notebook
+
+
+
+
+library(readstata13)
+#library(tidyverse)
+library(readstata13)
+library(openxlsx)
+library(tidyverse)
+library(readr)
+library(haven)
+library(readstata13)
+library(openxlsx)
+library(tidyverse)
+library(readr)
+library(haven)
+
+
+
+covid=read.xlsx("C:/Desktop/Projects/Covid vaccine allocation/covid allocation vaccine/covid.xlsx")
+
+# covid=covid[,-ncol(covid)]
+# colnames(covid)=c(h[1],"district_code",h[3:11])
+#pop=simulated_data[,c(1,2,3,4,5,6,7,8,9,10,11)]
+
+#Data=bind_rows(pop,covid)
+k=glm(death ~ sex_name + age + malignancy+idd+liver_disease+kidney_disease+diabetes+cardiovascular, data = covid, family = binomial(link = "logit"))
+covid$predict=predict(k,covid,type = "response")
+
+
+
+
+
+write_csv(covid,"C:/Desktop/Projects/Covid vaccine allocation/covid allocation vaccine/predicted_data.csv")
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
