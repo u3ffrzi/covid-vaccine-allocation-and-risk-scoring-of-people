@@ -24,9 +24,9 @@ If Not IsEmpty(cbProv) Then
        Next c
        End If
 End Sub
-Private Sub ComboBox1_Change()
-    'This routine makes levels of planning selectable based on national, provincial or district
-    
+'==================================================Supply Side============================================================='
+'---------------This routine makes levels of planning selectable based on national, provincial or district--------------------
+Private Sub ComboBox1_Change()  
     If ComboBox1.Value = "Provincial" Or ComboBox1.Value = "District" Then
         ComboBox2.Visible = True
     Else
@@ -48,8 +48,8 @@ Private Sub ComboBox1_Change()
     End If
 End Sub
 
+'------------- This routine updates or removes district dropdown list --------------
 Private Sub ComboBox2_Change()
-' This routine updates or removes district dropdown list
     ComboBox3.Clear
     If ComboBox1.Value = "District" Then
         ComboBox3.Visible = True
@@ -75,6 +75,7 @@ If Not IsEmpty(ComboBox3.Value) Then
 End If
 End Sub
 
+'============ Demand Side =================
 Private Sub CommandButton1_Click()
 
 'i = 1
@@ -82,8 +83,10 @@ Private Sub CommandButton1_Click()
 'Cells(2 + i, 1) = ctl.Name
 'i = i + 1
 'Next
-'risk score calculation
 
+
+'-----------------risk score calculation
+' The beta from regression analysis
 Dim risk, risk2 As Variant
 risk = Array(-5.150746, 0.2367982, 0.0418373, 1.025089, 0.4038391, 0.5943882, 0.3562976, 0.2469078, 0.1880846)
 risk2 = risk
@@ -111,9 +114,12 @@ If cardio.Value = False Then
 risk2(8) = 0
 End If
 
+'Calculate risk of the person based on their selections so far
 score = Exp(risk2(0) + risk2(1) + risk2(2) * userAge.Value + risk2(3) + risk2(4) + risk2(5) + risk2(6) + risk2(7) + risk2(8))
 riskScore = score / (1 + score)
 riskResult.Caption = "Your risk score is : " + Format(riskScore, "###0.00") + Chr(10)
+
+' leveling Risk of people to 5 groups
 If riskScore <= 0.02352454 Then
 gp = "EI"
 gi = 5
@@ -131,6 +137,7 @@ gp = "AI"
 gi = 1
 End If
 
+'Create and Update the output  text
 riskResult.Caption = riskResult.Caption + " " + Sheets("controls").Range("j1").Value + Application.WorksheetFunction.VLookup(gp, Sheets("controls").Range("I:J"), 2, 0) + Sheets("controls").Range("i1").Value + Chr(10)
 'pos = Application.Match("0", classValue, False)
 
@@ -144,11 +151,12 @@ res = Sheets("controls").Range("k3").Value
 End If
 riskResult.Caption = riskResult.Caption + res
 
-
+' Check national id format
 If Not (IsNumeric(userId.Value) And Len(userId.Value) = 10) Then
         MsgBox "only 10 numbers allowed in NationalID"
 Else
 
+' Save the user data to database 
 Sheets("USERS").Activate
 nRow = Range("a2").CurrentRegion.Rows.Count
 nRow = nRow + 1
@@ -192,8 +200,10 @@ Call startAlloc_Click
 
 End Sub
 
+======== Supply Side
+-------------- vaccine allocation to provinces and districts based on 5 risk levels and also public servant categories
     Public Sub startAlloc_Click()
-    'Main routine to start the allocation system
+    'Main routine to start the allocation system 
     
    
     'Initializing variables and sheets
@@ -225,9 +235,8 @@ End Sub
         classValue = Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
         classValue(0) = Application.WorksheetFunction.Min(vacNo, classNeed(0))
         
-        ' Allocate vaccine to different risk groups based on entered value by user
-        ' based on flowchart of prioritization
-  
+        '------------- Allocate vaccine to different risk groups based on entered value by user
+        '------------- based on flowchart of prioritization
         If Int(vacNo) >= classNeed(0) + classNeed(1) + classNeed(2) + classNeed(3) + classNeed(4) + classNeed(5) + classNeed(6) + classNeed(7) + classNeed(8) Then
             classValue(0) = classNeed(0)
             classValue(1) = classNeed(1)
@@ -318,7 +327,7 @@ End Sub
         val = 1
         End If
         
-        'Show the results in UI
+        ' Show the results in UI
         lbAllocated.Caption = Sheets("controls").Range("n1").Value
         For j = 0 To UBound(classess)
             lbAllocated.Caption = lbAllocated.Caption & Chr(10) & classNames(j) & ": " & CStr(Round(classValue(j), 0))
@@ -378,7 +387,7 @@ End If
     End Sub
     
 
-
+'============== UI/UX  controls
     Private Sub UserForm_Initialize()
       
     'populate radioButtons
@@ -475,7 +484,7 @@ ctl.ForeColor = RGB(170, 151, 57)
         
         
         
-
+'---------- update UI for female or male specific risk factors
 Private Sub userSex_Change()
 If userSex.Value = Range("D3").Value Then
 lbPregnancy.Visible = True
@@ -488,4 +497,5 @@ userPreg.Visible = False
 End If
 
 End Sub
+
 
